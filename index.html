@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BARMM Healthcare System | CHN White Book | Bangsamoro Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .transition-all { transition: all 0.3s ease; }
+        .recall-mode .reveal-text {
+            background-color: #cbd5e1;
+            color: transparent;
+            border-radius: 0.375rem;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            box-shadow: inset 0 0 0 1px #94a3b8;
+        }
+        .recall-mode .reveal-text:hover,
+        .recall-mode .reveal-text.revealed {
+            background-color: #fde047;
+            color: #1e293b;
+            box-shadow: none;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #0f766e; border-radius: 8px; }
+        .content-section { animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .locked-section { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+        .quiz-feedback-correct { background-color: #dcfce7; border-left: 4px solid #22c55e; }
+        .quiz-feedback-wrong { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+        .nav-btn i.fa-lock, .nav-btn i.fa-unlock-alt { width: 1.5rem; display: inline-block; }
+    </style>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { barmm: { light: '#ccfbf1', DEFAULT: '#0f766e', dark: '#115e59' } } } } }
+    </script>
+</head>
+<body class="bg-slate-50 h-screen flex flex-col md:flex-row font-sans text-slate-800 overflow-hidden">
+
+    <!-- Mobile header -->
+    <div class="md:hidden bg-barmm-dark text-white p-4 flex justify-between items-center shadow-md z-30 shrink-0">
+        <button onclick="toggleMobileMenu()" class="text-white focus:outline-none z-40"><i class="fa-solid fa-bars text-2xl"></i></button>
+        <h1 class="font-bold text-lg absolute left-1/2 transform -translate-x-1/2 pointer-events-none"><i class="fa-solid fa-flag-usa mr-2 text-barmm-light"></i>BARMM Health</h1>
+        <div class="w-8"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar" class="hidden md:flex flex-col w-full md:w-80 bg-white shadow-2xl h-full absolute md:relative z-30 transition-transform duration-300 shrink-0 border-r border-slate-200">
+        <div class="p-6 bg-gradient-to-br from-barmm-dark to-barmm text-white hidden md:block shrink-0">
+            <h1 class="font-black text-2xl tracking-wide"><i class="fa-solid fa-building mr-2 text-barmm-light"></i> BARMM Health System</h1>
+            <p class="text-sm text-slate-300 mt-1 font-medium">Bangsamoro Autonomous Region · PHN Review</p>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1 text-sm font-medium">
+                <li><button onclick="showSection('home')" id="btn-home" class="nav-btn w-full text-left px-6 py-3 bg-barmm-light text-barmm-dark border-r-4 border-barmm-dark transition-colors"><i class="fa-solid fa-house w-6 nav-icon"></i><i class="fa-solid fa-lock w-6 hidden"></i> Start / Overview</button></li>
+                <li><button onclick="showSection('gov')" id="btn-gov" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-landmark w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Governance & MOH BARMM</button></li>
+                <li><button onclick="showSection('facilities')" id="btn-facilities" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-hospital w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Health Facilities in BARMM</button></li>
+                <li><button onclick="showSection('challenges')" id="btn-challenges" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-triangle-exclamation w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Unique Challenges & Barriers</button></li>
+                <li><button onclick="showSection('programs')" id="btn-programs" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-hand-holding-heart w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Priority Health Programs</button></li>
+                <li><button onclick="showSection('phn_role')" id="btn-phn_role" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors locked-section"><i class="fa-solid fa-user-nurse w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> PHN Role in BARMM</button></li>
+                <li><button onclick="showSection('mnemonics')" id="btn-mnemonics" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 border-t border-slate-200 mt-2 locked-section"><i class="fa-solid fa-brain w-6 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Mnemonics & Recap</button></li>
+                <li><button onclick="showSection('final_quiz_sec')" id="btn-final_quiz_sec" class="nav-btn w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 locked-section"><i class="fa-solid fa-graduation-cap w-6 text-amber-500 nav-icon hidden"></i><i class="fa-solid fa-lock w-6"></i> Final 50‑Item Exam</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 h-full overflow-y-auto bg-slate-100 relative w-full">
+        <div class="fixed top-16 md:top-4 right-4 md:right-8 z-40 flex items-center bg-white/90 backdrop-blur px-4 py-3 rounded-full shadow-lg border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleRecallMode()">
+            <span class="mr-3 text-sm font-bold text-slate-700 hidden md:inline"><i class="fa-solid fa-brain text-barmm mr-1"></i> Active Recall</span>
+            <span class="mr-3 text-sm font-bold text-slate-700 md:hidden"><i class="fa-solid fa-brain text-barmm"></i></span>
+            <button id="recall-toggle" class="w-12 h-6 bg-slate-300 rounded-full relative transition-colors duration-300 focus:outline-none shadow-inner pointer-events-none">
+                <div id="recall-knob" class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow"></div>
+            </button>
+        </div>
+
+        <div class="p-4 md:p-8 max-w-6xl mx-auto pb-32">
+            <!-- HOME SECTION -->
+            <section id="home" class="content-section flex flex-col items-center justify-center min-h-[80vh] text-center block">
+                <div class="bg-gradient-to-br from-slate-800 to-barmm-dark text-white rounded-3xl shadow-2xl p-10 md:p-16 w-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 text-white opacity-5 pointer-events-none"><i class="fa-solid fa-flag-checkered text-[20rem]"></i></div>
+                    <div class="relative z-10">
+                        <div class="bg-white/10 backdrop-blur-sm inline-block p-4 rounded-full text-barmm-light mb-6 shadow-sm"><i class="fa-solid fa-building-circle-check text-5xl"></i></div>
+                        <h3 class="text-xl font-bold text-slate-300 mb-2 uppercase tracking-widest">RA 11054 · MOH BARMM · Devolution Plus</h3>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight drop-shadow-md">BARMM Healthcare<br>Delivery System</h1>
+                        <div class="bg-white/10 backdrop-blur inline-block px-6 py-3 rounded-full mb-10"><p class="text-lg text-white font-medium">“Unique challenges, Bangsamoro autonomy, and the PHN in geographically isolated and conflict‑affected areas”</p></div>
+                        <button onclick="unlockFirstSection()" class="bg-slate-600 hover:bg-slate-500 text-white font-black py-4 px-10 rounded-full shadow-xl transition-transform hover:scale-105 text-lg flex items-center mx-auto">Begin Lecture <i class="fa-solid fa-arrow-right ml-3"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 1: Governance & MOH BARMM -->
+            <section id="gov" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-landmark text-barmm mr-4"></i> Governance & Ministry of Health (MOH) BARMM</h2><div class="grid md:grid-cols-2 gap-6"><div><ul class="list-disc pl-5 space-y-2"><li><span class="reveal-text">RA 11054 (Bangsamoro Organic Law)</span> – established BARMM with fiscal and political autonomy.</li><li><span class="reveal-text">Ministry of Health (MOH) BARMM</span> – equivalent to DOH but under the Bangsamoro government. Led by the Minister of Health.</li><li>MOH BARMM has devolved powers over health facilities, regulation, and program implementation within the region.</li><li>Coordinates with DOH for national programs but has autonomous budget and policy‑making.</li></ul></div><div><div class="bg-amber-50 p-4 rounded-xl"><p class="font-bold">Geographic coverage:</p><p>Provinces: <span class="reveal-text">Maguindanao del Norte, Maguindanao del Sur, Lanao del Sur, Basilan, Sulu, Tawi‑Tawi</span>; plus Special Geographic Area (6 municipalities of Cotabato).</p></div><div class="bg-indigo-50 p-4 rounded-xl mt-3"><p><i class="fa-regular fa-building"></i> <strong>Key distinction:</strong> Unlike regular LGUs under RA 7160, BARMM has a parliamentary system and the MOH directly manages regional hospitals and provincial health offices in coordination with provincial LGUs.</p></div></div></div><button onclick="openQuiz('gov')" class="mt-8 w-full bg-barmm text-white font-black py-4 rounded-xl">⚙️ Take Quiz to Unlock Next Section</button></div></section>
+
+            <!-- SECTION 2: Health Facilities in BARMM -->
+            <section id="facilities" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-hospital text-barmm mr-4"></i> Health Facilities in BARMM</h2><div class="grid md:grid-cols-2 gap-4"><div><p><strong>Primary Level</strong></p><ul class="list-disc pl-5"><li>Barangay Health Stations (BHS) – often far apart, many without regular midwife.</li><li>Rural Health Units (RHUs) – under municipal LGUs, but many under‑staffed.</li><li>Community‑managed health posts (indigenous/ Moro communities).</li></ul><p class="mt-3"><strong>Secondary Level</strong></p><ul><li>Provincial hospitals – e.g., Amai Pakpak Medical Center (Lanao del Sur), Cotabato Regional Medical Center (part of BARMM SGA), Basilan General Hospital, Sulu Provincial Hospital, Tawi‑Tawi Provincial Hospital.</li><li>District hospitals – limited capacity, often without surgical teams.</li></ul></div><div><p><strong>Tertiary / Regional Referral</strong></p><ul><li><span class="reveal-text">Cotabato Regional and Medical Center (CRMC)</span> – largest referral hospital for BARMM, DOH‑retained but co‑managed with MOH.</li><li><span class="reveal-text">Amai Pakpak Medical Center</span> – tertiary referral for Lanao del Sur and Marawi.</li></ul><div class="bg-red-50 p-3 mt-2 rounded"><p><strong>Challenge:</strong> Many municipalities have no hospital; patients rely on RHUs and BHS with limited supplies and personnel.</p></div></div></div><button onclick="openQuiz('facilities')" class="mt-8 w-full bg-barmm text-white font-black py-4 rounded-xl">🏥 Take Quiz to Unlock Next Section</button></div></section>
+
+            <!-- SECTION 3: Unique Challenges & Barriers -->
+            <section id="challenges" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-triangle-exclamation text-barmm mr-4"></i> Unique Challenges & Health Barriers</h2><div class="grid md:grid-cols-2 gap-6"><div><ul class="list-disc pl-5 space-y-2"><li><span class="reveal-text">Geographic isolation</span> – islands (Basilan, Sulu, Tawi‑Tawi) and mountainous areas; transportation difficulties.</li><li><span class="reveal-text">Armed conflict & peace and order</span> – displacement of health workers, destroyed facilities, limited access during hostilities.</li><li><span class="reveal-text">Hard‑to‑reach communities</span> – some barangays accessible only by boat or long trek.</li><li><span class="reveal-text">Shortage of health workers</span> – low retention of doctors, nurses, midwives due to security concerns and lack of housing.</li><li>Cultural and religious sensitivities – need for gender‑sensitive care, respect for traditional healers (e.g., <em>hilot</em>, <em>tambo</em>).</li></ul></div><div><div class="bg-slate-100 p-4 rounded-xl"><p><strong>Health indicators (worse than national average):</strong></p><ul class="list-disc pl-5"><li>High maternal mortality ratio (MMR) – many home deliveries without skilled birth attendants.</li><li>High infant and under‑five mortality – malnutrition, vaccine‑preventable diseases.</li><li>Low immunization coverage – missed children due to conflict.</li><li>Malnutrition and food insecurity – especially in Sulu and Tawi‑Tawi.</li><li>Limited access to safe water and sanitation – diarrheal diseases common.</li></ul></div></div></div><button onclick="openQuiz('challenges')" class="mt-8 w-full bg-barmm text-white font-black py-4 rounded-xl">⚠️ Take Quiz to Unlock Next Section</button></div></section>
+
+            <!-- SECTION 4: Priority Health Programs in BARMM -->
+            <section id="programs" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-hand-holding-heart text-barmm mr-4"></i> Priority Health Programs (MOH BARMM)</h2><ul class="list-disc pl-5 space-y-2"><li><span class="reveal-text">Maternal, Newborn and Child Health (MNCH)</span> – BEmONC training for midwives, home visiting for high‑risk pregnancies.</li><li><span class="reveal-text">Expanded Program on Immunization (EPI)</span> – “Reaching Every Barangay” strategy adapted for conflict zones; mobile vaccination teams.</li><li><span class="reveal-text">TB Control Program (NTP)</span> – DOTS expansion, challenges in sputum transport from islands.</li><li><span class="reveal-text">Malaria and Filariasis elimination</span> – endemic in Sulu, Tawi‑Tawi, and Maguindanao; indoor residual spraying and mass drug administration.</li><li><span class="reveal-text">Schistosomiasis control</span> – in areas with rice paddies.</li><li><span class="reveal-text">Nutrition program</span> – micronutrient supplementation, feeding programs in schools, management of severe acute malnutrition.</li><li><span class="reveal-text">WASH (Water, Sanitation & Hygiene)</span> – construction of toilets, promotion of safe water sources.</li></ul><div class="bg-barmm-light p-3 mt-3 rounded-lg"><p><i class="fa-regular fa-hospital"></i> <strong>Bangsamoro UHC (Universal Health Care)</strong> – integration of BARMM into NHIP (PhilHealth) with subsidies for indigents.</p></div><button onclick="openQuiz('programs')" class="mt-8 w-full bg-barmm text-white font-black py-4 rounded-xl">📋 Take Quiz to Unlock Next Section</button></div></section>
+
+            <!-- SECTION 5: PHN Role in BARMM -->
+            <section id="phn_role" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-user-nurse text-barmm mr-4"></i> Public Health Nurse in BARMM</h2><ul class="list-disc pl-5 space-y-3"><li><strong>Mobile service delivery:</strong> PHN leads outreach teams to isolated barangays via boat or habal‑habal.</li><li><strong>Emergency preparedness:</strong> responds to conflict‑related displacements, sets up temporary health posts in evacuation centers.</li><li><strong>Culturally competent care:</strong> respects Islamic practices, gender sensitivity (female health workers for female patients).</li><li><strong>Coordination with MILF/Bangsamoro structures:</strong> engages with local community leaders (datus, imams) to promote health programs.</li><li><strong>Training BHWs and traditional birth attendants (TBAs):</strong> promotes clean deliveries and referral of complications.</li><li><strong>Surveillance and outbreak response:</strong> reports notifiable diseases despite logistical difficulties; uses satellite phones where needed.</li><li><strong>Advocacy for peace and health:</strong> works with MOH BARMM and humanitarian organizations (ICRC, UNICEF).</li></ul><div class="bg-barmm-light p-3 mt-3 rounded-lg"><p><i class="fa-regular fa-handshake"></i> <strong>Key partners:</strong> MOH BARMM, DOH‑CHD SOCCSKSARGEN (for SGA), WHO, UNICEF, IFRC, local NGOs.</p></div><button onclick="openQuiz('phn_role')" class="mt-8 w-full bg-barmm text-white font-black py-4 rounded-xl">🩺 Take Quiz to Unlock Mnemonics & Final Exam</button></div></section>
+
+            <!-- MNEMONICS SECTION -->
+            <section id="mnemonics" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8"><h2 class="text-3xl font-black mb-6 border-b-2 border-barmm pb-3"><i class="fa-solid fa-brain text-barmm mr-4"></i> Mnemonics & Quick Recap – BARMM Health</h2><div class="overflow-x-auto"><table class="w-full border-collapse border border-slate-200"><thead class="bg-barmm-dark text-white"><tr><th class="p-3">Topic</th><th class="p-3">Mnemonic / Key</th><th class="p-3">Description</th></tr></thead><tbody><tr class="border-b"><td class="p-2 font-semibold">Organic law</td><td class="text-barmm font-black">RA 11054</td><td class="reveal-text">Bangsamoro Organic Law – created BARMM with autonomous health ministry</td></tr>
+<tr class="bg-slate-50 border-b"><td class="p-2 font-semibold">MOH BARMM</td><td class="text-barmm font-black">Ministry of Health</td><td class="reveal-text">Equivalent to DOH but under Bangsamoro government</td></tr>
+<tr class="border-b"><td class="p-2 font-semibold">Provinces of BARMM</td><td class="text-barmm font-black">Maguindanao (2), Lanao Sur, Basilan, Sulu, Tawi‑Tawi</td><td class="reveal-text">5 provinces (plus SGA – Cotabato barangays)</td></tr>
+<tr class="bg-slate-50 border-b"><td class="p-2 font-semibold">Top referral hospitals</td><td class="text-barmm font-black">CRMC & Amai Pakpak</td><td class="reveal-text">Cotabato Regional and Medical Center; Amai Pakpak Medical Center (Marawi)</td></tr>
+<tr class="border-b"><td class="p-2 font-semibold">Major health challenges</td><td class="text-barmm font-black">3I: Islands, Isolation, Insecurity</td><td class="reveal-text">Geographic isolation, armed conflict, hard‑to‑reach areas</td></tr>
+<tr class="bg-slate-50 border-b"><td class="p-2 font-semibold">Key programs</td><td class="text-barmm font-black">MNCH, EPI, TB, Malaria, Schisto, Nutri, WASH</td><td class="reveal-text">Maternal/child, immunization, TB, malaria, schistosomiasis, nutrition, water/sanitation</td></tr>
+<tr><td class="p-2 font-semibold">PHN strategy</td><td class="text-barmm font-black">Mobile, cultural, peace‑sensitive</td><td class="reveal-text">Outreach teams, respect for Islamic practices, coordination with local leaders</td></tr>
+</tbody></table></div><button onclick="openQuiz('final_quiz')" class="mt-8 w-full bg-amber-500 text-slate-900 font-black py-4 rounded-xl text-lg shadow-md hover:bg-amber-400">🎓 Take Final 50-Item Exam</button></div></section>
+
+            <!-- FINAL QUIZ SECTION -->
+            <section id="final_quiz_sec" class="content-section hidden"><div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 text-center min-h-[60vh] flex flex-col justify-center items-center"><i class="fa-solid fa-graduation-cap text-8xl text-amber-400 mb-6"></i><h2 class="text-4xl font-black text-slate-800 mb-4">BARMM Healthcare Mastery Exam</h2><p class="text-lg text-slate-600 mb-8">50 items covering BARMM governance, facilities, challenges, programs, and PHN roles. 75% required to pass.</p><button onclick="openQuiz('final_quiz')" class="w-full max-w-md bg-slate-800 text-white font-black py-4 rounded-xl shadow-md hover:bg-slate-900 text-xl">Start Final Exam</button></div></section>
+        </div>
+    </main>
+
+    <!-- QUIZ MODAL -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4"><div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"><button onclick="closeQuiz()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark text-2xl"></i></button><h2 id="quiz-title" class="text-3xl font-black text-slate-800 mb-2"></h2><p class="text-slate-600 mb-6 font-medium border-b pb-4">Score ≥75% to unlock next section.</p><div id="quiz-questions-container" class="space-y-4"></div><button id="quiz-submit-btn" onclick="submitQuiz()" class="mt-8 w-full bg-barmm text-white font-bold py-4 rounded-xl shadow-lg">Submit Answers</button><div id="quiz-result-container" class="hidden mt-6 p-4 rounded-xl bg-slate-100 border"></div></div></div>
+
+    <script>
+        let unlockedSections = ['home'];
+        // QUIZ BANK (10 questions each)
+        const quizzes = {
+            gov: { title: "Governance & MOH BARMM", next: "facilities", questions: [
+                { q: "What is the legal basis for the creation of BARMM?", options: ["RA 11054 (Bangsamoro Organic Law)", "RA 7160", "EO 102", "RA 1082"], ans: 0 },
+                { q: "The Ministry of Health BARMM is equivalent to:", options: ["DOH", "PhilHealth", "Local Health Board", "NNC"], ans: 0 },
+                { q: "Which of the following is NOT a province in BARMM?", options: ["Zamboanga del Sur", "Maguindanao del Norte", "Sulu", "Tawi‑Tawi"], ans: 0 },
+                { q: "MOH BARMM has autonomy over:", options: ["Health policy, budget, and facility management within the region", "International relations only", "Agriculture", "Education"], ans: 0 },
+                { q: "The parliamentary system in BARMM means:", options: ["Ministers are from the Bangsamoro Parliament", "Direct rule from Manila", "No local government", "Appointed by the President only"], ans: 0 },
+                { q: "Which agency coordinates with MOH BARMM for national programs?", options: ["DOH central office / CHDs", "DPWH", "DA", "DepEd"], ans: 0 },
+                { q: "BARMM covers how many provinces (excluding SGA)?", options: ["5", "6", "4", "7"], ans: 0 },
+                { q: "The Special Geographic Area (SGA) refers to:", options: ["6 municipalities in Cotabato that voted to join BARMM", "Island provinces", "Mountainous areas", "Marawi City"], ans: 0 },
+                { q: "MOH BARMM is led by the:", options: ["Minister of Health", "Secretary of Health", "Regional Director", "Governor"], ans: 0 },
+                { q: "Unlike regular LGUs, BARMM has the power to:", options: ["Create own health laws and manage DOH‑retained facilities within the region", "Declare war", "Print money", "Conduct foreign policy"], ans: 0 }
+            ]},
+            facilities: { title: "Health Facilities in BARMM", next: "challenges", questions: [
+                { q: "Which is the largest referral hospital in BARMM?", options: ["Cotabato Regional and Medical Center (CRMC)", "Philippine Heart Center", "NKTI", "Lung Center"], ans: 0 },
+                { q: "Amai Pakpak Medical Center is located in:", options: ["Marawi City, Lanao del Sur", "Jolo, Sulu", "Bongao, Tawi‑Tawi", "Cotabato City"], ans: 0 },
+                { q: "Most rural health units in BARMM are under the governance of:", options: ["Municipal LGUs", "MOH BARMM directly", "DOH central office", "Provincial governors only"], ans: 0 },
+                { q: "A common problem with BHS in BARMM is:", options: ["Under‑staffing and lack of midwives", "Too many specialists", "Excessive funding", "Overcrowded with referrals"], ans: 0 },
+                { q: "Which province faces extreme geographic isolation for health access?", options: ["Tawi‑Tawi (island chain)", "Maguindanao del Sur", "Lanao del Sur", "North Cotabato"], ans: 0 },
+                { q: "Primary level facilities in BARMM include all EXCEPT:", options: ["Tertiary hospital", "BHS", "RHU", "Lying‑in clinic"], ans: 0 },
+                { q: "Which hospital serves as the main referral for Basilan province?", options: ["Basilan General Hospital", "CRMC", "Amai Pakpak", "Southern Philippines Medical Center"], ans: 0 },
+                { q: "Many district hospitals in BARMM lack:", options: ["Surgical teams and essential equipment", "Nurses", "Electricity", "Patients"], ans: 0 },
+                { q: "The term 'geographically isolated and disadvantaged areas' (GIDA) applies to:", options: ["Remote barangays with poor access to health facilities", "Urban cities", "Regional centers", "All hospitals"], ans: 0 },
+                { q: "Which type of facility is most common in far‑flung islands of Sulu?", options: ["Barangay Health Station (often unmanned)", "Tertiary hospital", "Medical center", "Specialty center"], ans: 0 }
+            ]},
+            challenges: { title: "Unique Challenges & Barriers", next: "programs", questions: [
+                { q: "Which is a major security challenge to health delivery in BARMM?", options: ["Armed conflict and displacement", "Typhoons only", "Tsunami", "Volcanic eruption"], ans: 0 },
+                { q: "Why do some PHNs and midwives refuse assignment in remote areas of BARMM?", options: ["Peace and order concerns, lack of housing, isolation", "High salary", "Too many doctors", "Excellent roads"], ans: 0 },
+                { q: "Maternal mortality in BARMM is higher than national average because:", options: ["Home deliveries without skilled birth attendants, poor access to BEmONC", "Free tertiary care", "Many cesarean sections", "Good immunization coverage"], ans: 0 },
+                { q: "Which disease is endemic in Sulu and Tawi‑Tawi and requires mass drug administration?", options: ["Malaria and Filariasis", "Dengue", "COVID‑19", "Tetanus"], ans: 0 },
+                { q: "Low immunization coverage in BARMM is often attributed to:", options: ["Missed children due to conflict and geographic barriers", "Vaccine refusal only", "No EPI program", "Too many vaccines"], ans: 0 },
+                { q: "What factor contributes to malnutrition in BARMM?", options: ["Food insecurity and limited access to nutritious food", "Overnutrition", "Excess vitamin intake", "Too many feeding programs"], ans: 0 },
+                { q: "Cultural consideration for PHNs in BARMM includes:", options: ["Respect for modesty, female health workers for female patients, engagement with imams", "Western medicine only", "Ignoring traditional healers", "No need for gender sensitivity"], ans: 0 },
+                { q: "Which infrastructure problem severely affects health access in island provinces?", options: ["Lack of regular sea transport and poor port facilities", "Too many bridges", "Excess airports", "Heavy traffic"], ans: 0 },
+                { q: "Displacement due to conflict leads to:", options: ["Overcrowded evacuation centers with increased risk of outbreaks", "Better health services", "Reduced disease transmission", "Permanent immunity"], ans: 0 },
+                { q: "Which of the following is a challenge for disease surveillance in BARMM?", options: ["Difficulty transporting specimens from remote areas, communication breakdown", "No diseases", "Too many labs", "Over‑reporting"], ans: 0 }
+            ]},
+            programs: { title: "Priority Health Programs", next: "phn_role", questions: [
+                { q: "BEmONC stands for:", options: ["Basic Emergency Obstetric and Newborn Care", "Bacterial Emergency Neonatal Care", "Bangsamoro Emergency Obstetric Network", "Basic Epidemiology of Newborn Care"], ans: 0 },
+                { q: "Which strategy is used for immunization in hard‑to‑reach BARMM areas?", options: ["Mobile vaccination teams and 'Reaching Every Barangay' (REB)", "Only fixed centers", "No immunization", "School‑based only"], ans: 0 },
+                { q: "DOTS is a strategy under which program?", options: ["National Tuberculosis Control Program", "Malaria", "EPI", "Family Planning"], ans: 0 },
+                { q: "Mass drug administration (MDA) in BARMM is done for:", options: ["Filariasis & Schistosomiasis", "Diabetes", "Hypertension", "Cancer"], ans: 0 },
+                { q: "The nutrition program in BARMM includes:", options: ["Micronutrient supplementation (Vitamin A, iron), feeding programs, management of SAM", "Only surgery", "Radiotherapy", "Cardiac rehabilitation"], ans: 0 },
+                { q: "WASH program primarily addresses:", options: ["Water, sanitation and hygiene – to reduce diarrheal diseases", "Women and child health", "Mental health", "Air pollution"], ans: 0 },
+                { q: "PhilHealth's role in BARMM includes:", options: ["Subsidized premium for indigents and facility accreditation", "Construction of roads", "Provision of security", "Training of lawyers"], ans: 0 },
+                { q: "Which program aims to eliminate malaria in BARMM?", options: ["Indoor residual spraying, early diagnosis and treatment, distribution of LLINs", "Mass vaccination", "DOTS", "BEmONC"], ans: 0 },
+                { q: "TB sputum collection in remote islands is challenging; MOH BARMM uses:", options: ["Mobile x‑ray and courier systems", "No testing", "Only clinical diagnosis", "PCR everywhere"], ans: 0 },
+                { q: "Schistosomiasis control is important in BARMM areas with:", options: ["Rice paddies and snail habitats", "Deserts", "High altitude", "Urban centers"], ans: 0 }
+            ]},
+            phn_role: { title: "PHN Role in BARMM", next: "mnemonics", questions: [
+                { q: "The PHN in BARMM often uses what mode of transport to reach isolated barangays?", options: ["Boat, habal‑habal (motorcycle), or walking", "Helicopter only", "Private car", "Train"], ans: 0 },
+                { q: "During conflict displacement, the PHN's priority action is:", options: ["Set up temporary health posts in evacuation centers, provide basic care and surveillance", "Close all clinics", "Leave the area", "Only do office work"], ans: 0 },
+                { q: "To increase vaccine acceptance, PHN should:", options: ["Coordinate with imams and community leaders to address misconceptions", "Force vaccination", "Avoid speaking to community", "Use only mass media"], ans: 0 },
+                { q: "Which traditional birth attendant strategy is culturally appropriate?", options: ["Train TBAs on clean delivery and referral of danger signs", "Arrest TBAs", "Ignore them", "Replace with untrained youth"], ans: 0 },
+                { q: "The PHN ensures continuity of care for TB patients in far areas by:", options: ["Training village health workers to supervise DOTS", "Only hospital admission", "No follow‑up", "Loose medicines"], ans: 0 },
+                { q: "A key partner for humanitarian health action in BARMM is:", options: ["ICRC, UNICEF, WHO, and local Red Cross", "Only DOH central", "Department of Tourism", "Department of Finance"], ans: 0 },
+                { q: "When conducting home visits in conservative communities, the PHN should:", options: ["Respect gender preferences, bring a female health worker for female clients", "Enter without permission", "Refuse to wear appropriate clothing", "Disrespect local customs"], ans: 0 },
+                { q: "The PHN participates in rapid response to disease outbreaks by:", options: ["Reporting immediately to MOH BARMM and coordinating with local leaders", "Ignoring the outbreak", "Delaying treatment", "Only doing administrative tasks"], ans: 0 },
+                { q: "Which skill is essential for PHNs assigned to BARMM?", options: ["Cultural competence and conflict‑sensitive communication", "Heart surgery", "Drone piloting", "Legal practice"], ans: 0 },
+                { q: "The PHN supports the BARMM UHC implementation by:", options: ["Facilitating enrollment of indigents to PhilHealth and promoting primary care", "Building private hospitals", "Increasing out‑of‑pocket expenses", "Eliminating all referrals"], ans: 0 }
+            ]}
+        };
+
+        // Build final quiz (50 items)
+        let finalQuestions = [];
+        for(let sec of ['gov','facilities','challenges','programs','phn_role']) {
+            finalQuestions = finalQuestions.concat(quizzes[sec].questions.slice(0,10));
+        }
+        while(finalQuestions.length < 50) finalQuestions.push(quizzes['gov'].questions[0]);
+        quizzes['final_quiz'] = { title: "Final 50-Item Exam: BARMM Healthcare System", next: null, questions: finalQuestions };
+
+        function unlockFirstSection() { if(!unlockedSections.includes('gov')) { unlockedSections.push('gov'); updateSidebarUI(); } showSection('gov'); }
+        function showSection(id) { if(!unlockedSections.includes(id) && id !== 'home') { alert("Please pass the quiz at the bottom of the previous section to unlock."); return; } document.querySelectorAll('.content-section').forEach(el=>el.classList.add('hidden')); document.getElementById(id)?.classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(btn=>{btn.classList.remove('bg-barmm-light','text-barmm-dark','border-r-4','border-barmm-dark'); btn.classList.add('text-slate-600');}); let active=document.getElementById('btn-'+id); if(active){active.classList.remove('text-slate-600');active.classList.add('bg-barmm-light','text-barmm-dark','border-r-4','border-barmm-dark');} if(window.innerWidth<768)document.getElementById('sidebar').classList.add('hidden'); document.querySelector('main').scrollTop=0; }
+        function updateSidebarUI(){['home','gov','facilities','challenges','programs','phn_role','mnemonics','final_quiz_sec'].forEach(sec=>{let btn=document.getElementById('btn-'+sec);if(!btn)return;let lock=btn.querySelector('.fa-lock'),icon=btn.querySelector('.nav-icon');if(unlockedSections.includes(sec)||sec==='home'){btn.classList.remove('locked-section');if(lock)lock.classList.add('hidden');if(icon)icon.classList.remove('hidden');}else{btn.classList.add('locked-section');if(lock)lock.classList.remove('hidden');if(icon)icon.classList.add('hidden');}});}
+        let currentQuiz = null;
+        function openQuiz(sectionId) { currentQuiz=sectionId; let qd=quizzes[sectionId]; document.getElementById('quiz-title').innerText=qd.title; let container=document.getElementById('quiz-questions-container'); container.innerHTML=''; qd.questions.forEach((q,idx)=>{let html=`<div class="bg-slate-50 p-4 rounded-xl mb-4"><p class="font-bold mb-3">${idx+1}. ${q.q}</p><div class="space-y-2" data-qidx="${idx}">`; q.options.forEach((opt,oi)=>{html+=`<label class="flex items-center space-x-3 p-2 hover:bg-white cursor-pointer"><input type="radio" name="q${idx}" value="${oi}" class="form-radio text-barmm"><span>${opt}</span></label>`;}); html+=`</div><div class="feedback-${idx} text-sm mt-2 hidden"></div></div>`; container.innerHTML+=html;}); document.getElementById('quiz-submit-btn').classList.remove('hidden'); document.getElementById('quiz-result-container').classList.add('hidden'); document.getElementById('quiz-modal').classList.remove('hidden'); }
+        function closeQuiz() { document.getElementById('quiz-modal').classList.add('hidden'); }
+        function submitQuiz() { let qd=quizzes[currentQuiz]; let score=0; for(let i=0;i<qd.questions.length;i++){ let selected=document.querySelector(`input[name="q${i}"]:checked`); let correct=(selected&&parseInt(selected.value)===qd.questions[i].ans); if(correct) score++; let fbDiv=document.querySelector(`.feedback-${i}`); if(fbDiv){ let correctAns=qd.questions[i].options[qd.questions[i].ans]; if(correct){fbDiv.innerHTML='<span class="text-green-700">✔ Correct!</span>';fbDiv.parentElement?.classList.add('quiz-feedback-correct');}else{let selectedText=selected?qd.questions[i].options[parseInt(selected.value)]:"No answer";fbDiv.innerHTML=`<span class="text-red-700">✘ Incorrect. Correct: ${correctAns}</span>`;fbDiv.parentElement?.classList.add('quiz-feedback-wrong');}fbDiv.classList.remove('hidden');}} let percent=(score/qd.questions.length)*100; let btn=document.getElementById('quiz-submit-btn'); let resultDiv=document.getElementById('quiz-result-container'); btn.classList.add('hidden'); resultDiv.classList.remove('hidden'); if(percent>=75){ if(currentQuiz==='final_quiz'){ resultDiv.innerHTML=`<div class="text-amber-500 text-6xl text-center">🏆</div><h3 class="text-2xl font-black text-center">Excellent!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><p class="text-center text-green-700">You mastered BARMM Healthcare System!</p><button onclick="closeQuiz()" class="mt-4 w-full bg-slate-800 text-white py-2 rounded-lg">Close</button>`; return; } if(qd.next && !unlockedSections.includes(qd.next)){ unlockedSections.push(qd.next); if(qd.next==='mnemonics') unlockedSections.push('final_quiz_sec'); updateSidebarUI(); } resultDiv.innerHTML=`<div class="text-green-600 text-5xl text-center">✓</div><h3 class="text-2xl font-black text-center">Passed!</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="closeQuiz(); showSection('${qd.next}')" class="mt-4 w-full bg-green-600 text-white py-2 rounded-lg">Unlock Next Section</button>`; } else { resultDiv.innerHTML=`<div class="text-red-500 text-5xl text-center">✗</div><h3 class="text-2xl font-black text-center">Failed (Need 75%)</h3><p class="text-center">Score ${score}/${qd.questions.length} (${percent}%)</p><button onclick="openQuiz('${currentQuiz}')" class="mt-4 w-full bg-slate-600 text-white py-2 rounded-lg">Try Again</button>`; } }
+        function toggleRecallMode(){ let active=!document.body.classList.contains('recall-mode'); let toggle=document.getElementById('recall-toggle'),knob=document.getElementById('recall-knob'); if(active){document.body.classList.add('recall-mode');toggle.classList.add('bg-barmm-dark');knob.classList.add('translate-x-6');}else{document.body.classList.remove('recall-mode');toggle.classList.remove('bg-barmm-dark');knob.classList.remove('translate-x-6');} }
+        function toggleMobileMenu(){ let s=document.getElementById('sidebar'); if(s.classList.contains('hidden')) s.classList.remove('hidden','flex','absolute','h-full','z-50'); else s.classList.add('hidden'); }
+        document.addEventListener('DOMContentLoaded',()=>{ updateSidebarUI(); document.querySelectorAll('.reveal-text').forEach(el=>el.addEventListener('click',function(){if(document.body.classList.contains('recall-mode'))this.classList.toggle('revealed');})); });
+    </script>
+</body>
+</html>
